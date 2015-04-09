@@ -1,0 +1,33 @@
+{
+    "name": "depage/xml",
+    "description": "xml",
+    "type": "library",
+    "keywords": [
+        "xml"
+    ],
+    "require": {
+        "php": " >= 5.3",
+    },
+    "autoload": {
+        "psr-4": { "Depage\\Xml\\": "" }
+    },
+    "support": {
+        "email": "info@depage.net",
+        "source": "https://github.com/depage/depage-xml",
+        "issues": "https://github.com/depage/depage-xml/issues"
+
+    },
+    "time": "2014-12-25",
+    "license": [
+        "MIT",
+        "GPL-2.0"
+    ],
+    "authors": [
+        {
+            "name": "Frank Hellenkamp",
+            "homepage": "http://depage.net",
+            "role": "Developer"
+        }
+    ]
+}
+
