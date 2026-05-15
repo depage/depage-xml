@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file    document.php
  *
@@ -27,7 +28,8 @@ class Document extends \DOMDocument
      *
      * @return  (Depage::HtmlForm::Abstracts::HtmlDom) htmlDOM
      **/
-    public function __construct($version = null, $encoding = null) {
+    public function __construct($version = null, $encoding = null)
+    {
         if (is_null($version)) {
             $version = "1.0";
         }
@@ -35,6 +37,48 @@ class Document extends \DOMDocument
             $encoding = "UTF-8";
         }
         parent::__construct($version, $encoding);
+    }
+    // }}}
+    // {{{ __serialize()
+    /**
+     * @brief   serializes htmldom into string
+     *
+     * @return  array containing the XML string
+     **/
+    public function __serialize(): array
+    {
+        if ($this->documentElement === null) {
+            return [
+                'xml' => '',
+            ];
+        }
+
+        return [
+            'xml' => (string) $this,
+        ];
+    }
+    // }}}
+    // {{{ __unserialize()
+    /**
+     * @brief   unserializes htmldom-objects
+     *
+     * @param   array $data containing the XML string
+     *
+     * @return  (void)
+     **/
+    public function __unserialize(array $data): void
+    {
+        if (empty($data['xml'])) {
+            $this->loadXML('<root/>');
+            $this->version = "1.0";
+            $this->encoding = "UTF-8";
+
+            $this->removeChild($this->documentElement);
+
+            return;
+        }
+
+        $this->loadXML($data['xml']);
     }
     // }}}
 
@@ -46,7 +90,7 @@ class Document extends \DOMDocument
      *
      * @return  array($doc, $node)
      **/
-    public static function getDocAndNode(\DOMNode $docOrNode)
+    public static function getDocAndNode(\DOMNode $docOrNode): array
     {
         if ($docOrNode->nodeType == XML_DOCUMENT_NODE) {
             $doc = $docOrNode;
@@ -56,7 +100,7 @@ class Document extends \DOMDocument
             $node = $docOrNode;
         }
 
-        return array($doc, $node);
+        return [$doc, $node];
     }
     // }}}
     // {{{ fromDomDocument()
@@ -66,7 +110,7 @@ class Document extends \DOMDocument
      * @param mixed
      * @return void
      **/
-    static public function fromDomDocument(\DOMDocument $dom)
+    public static function fromDomDocument(\DOMDocument $dom): self
     {
         $xml = new Document();
         $rootNode = $dom->documentElement;
@@ -85,14 +129,14 @@ class Document extends \DOMDocument
      * @param mixed $replace
      * @return void
      **/
-    public static function replaceAttributeNames($node, $search, $replace):void
+    public static function replaceAttributeNames(\DOMNode $node, string|array $search, string|array $replace): void
     {
         $xpath = new \DOMXPath($node->ownerDocument);
         if (is_string($search)) {
             $attrName = $search;
 
             $query = ".//@$attrName";
-        } else if (is_array($search)) {
+        } elseif (is_array($search)) {
             $attrNS = $search[0];
             $attrName = $search[1];
 
@@ -110,7 +154,7 @@ class Document extends \DOMDocument
 
             if (is_string($replace)) {
                 $parent->setAttribute($replace, $n->nodeValue);
-            } else if (is_array($replace)) {
+            } elseif (is_array($replace)) {
                 $parent->setAttributeNS($replace[0], $replace[1], $n->nodeValue);
             }
             $parent->removeAttributeNode($n);
@@ -120,28 +164,13 @@ class Document extends \DOMDocument
 
     // {{{ __toString()
     /**
-     * @brief   unserializes htmldom-objects
+     * @brief   converts the document to a string by saving it as XML
      *
-     * @param   $serialized (string)
-     *
-     * @return  (void)
+     * @return  string
      **/
-    public function __toString() {
+    public function __toString(): string
+    {
         return $this->saveXML();
-    }
-    // }}}
-    // {{{ __serialize()
-    public function __serialize():array
-    {
-        return [
-            'xml' => $this->saveXML(),
-        ];
-    }
-    // }}}
-    // {{{ __unserialize()
-    public function __unserialize(array $data):void
-    {
-        $this->loadXML($data['xml']);
     }
     // }}}
 }
